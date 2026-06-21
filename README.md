@@ -43,6 +43,11 @@ AEC/
   - Usuario.cs
   - Endereco.cs
   - ViaCepResposta.cs
+  - LoginViewModel.cs
+
+- Services/
+  - ViaCepService.cs
+  - CsvService.cs
 
 - Views/
   - Login/
@@ -55,6 +60,7 @@ AEC/
 
 - Scripts/
   - banco.sql
+  - banco-sqlserver.sql
 
 - wwwroot/
 - Program.cs
@@ -63,13 +69,20 @@ AEC/
 
 ## Banco de dados
 
-O projeto utiliza SQLite para simplificar a execução local.
+O projeto utiliza SQLite para facilitar a execução local e a avaliação do teste.
 
 O banco de dados é criado automaticamente ao executar a aplicação, através do Entity Framework Core.
 
-Também foi incluído o script de criação das tabelas na pasta:
+Também foram disponibilizados scripts de criação das tabelas na pasta Scripts.
 
-Scripts/banco.sql
+Scripts disponíveis:
+
+- Scripts/banco.sql
+- Scripts/banco-sqlserver.sql
+
+O arquivo banco.sql representa a estrutura utilizada com SQLite.
+
+O arquivo banco-sqlserver.sql foi incluído considerando a tecnologia SQL Server sugerida no enunciado.
 
 ## Tabelas
 
@@ -143,21 +156,19 @@ http://localhost:5000
 8. Na tela principal, é possível editar, excluir ou exportar os endereços cadastrados.
 9. Clique em "Exportar CSV" para baixar o arquivo com os endereços.
 
-## Scripts do banco
-
-O script de criação das tabelas está disponível em:
-
-Scripts/banco.sql
-
-Esse arquivo contém a estrutura das tabelas Usuarios e Enderecos, além da inserção de um usuário padrão para teste.
-
-## Observações
+## Observações técnicas
 
 - O campo complemento é opcional.
 - O número do endereço é preenchido manualmente, pois a API ViaCEP não retorna essa informação.
 - A aplicação controla os endereços por usuário logado.
 - O arquivo CSV é gerado com os endereços cadastrados pelo usuário autenticado.
 - O arquivo de banco SQLite local não foi versionado no GitHub, pois ele é gerado automaticamente ao executar a aplicação.
+
+## Segurança
+
+Para simplificação do teste, foi utilizado um login básico com usuário padrão.
+
+Em um ambiente de produção, a senha não deveria ser armazenada em texto puro. O ideal seria utilizar hash seguro de senha e uma solução de autenticação mais robusta, como ASP.NET Identity.
 
 ## API utilizada
 
@@ -174,5 +185,4 @@ https://github.com/Yanna01santos/teste-dev-sharp-aec
 Yanna Aparecida
 
 Projeto desenvolvido para teste prático de Desenvolvedor C#.
-
 '@ | Set-Content -Path README.md -Encoding UTF8
