@@ -1,4 +1,5 @@
 using AEC.Data;
+using AEC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,25 +16,27 @@ namespace AEC.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View(new LoginViewModel());
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(string usuario, string senha)
+        public async Task<IActionResult> Index(LoginViewModel model)
         {
-            if (string.IsNullOrWhiteSpace(usuario) || string.IsNullOrWhiteSpace(senha))
+            if (!ModelState.IsValid)
             {
-                ViewBag.Erro = "Informe o usuário e a senha.";
-                return View();
+                return View(model);
             }
 
             var usuarioEncontrado = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.UsuarioLogin == usuario && u.Senha == senha);
+                .FirstOrDefaultAsync(u =>
+                    u.UsuarioLogin == model.Usuario &&
+                    u.Senha == model.Senha
+                );
 
             if (usuarioEncontrado == null)
             {
                 ViewBag.Erro = "Usuário ou senha inválidos.";
-                return View();
+                return View(model);
             }
 
             HttpContext.Session.SetInt32("UsuarioId", usuarioEncontrado.Id);

@@ -1,21 +1,25 @@
 using AEC.Data;
 using AEC.Models;
+using AEC.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net.Http.Json;
-using System.Text;
 
 namespace AEC.Controllers
 {
     public class EnderecosController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ViaCepService _viaCepService;
+        private readonly CsvService _csvService;
 
-        public EnderecosController(AppDbContext context, IHttpClientFactory httpClientFactory)
+        public EnderecosController(
+            AppDbContext context,
+            ViaCepService viaCepService,
+            CsvService csvService)
         {
             _context = context;
-            _httpClientFactory = httpClientFactory;
+            _viaCepService = viaCepService;
+            _csvService = csvService;
         }
 
         public async Task<IActionResult> Index()
@@ -171,13 +175,9 @@ namespace AEC.Controllers
                 return BadRequest(new { erro = "O CEP deve conter 8 dígitos." });
             }
 
-            var client = _httpClientFactory.CreateClient();
+            var resultado = await _viaCepService.BuscarEnderecoPorCepAsync(cep);
 
-            var resultado = await client.GetFromJsonAsync<ViaCepResposta>(
-                $"https://viacep.com.br/ws/{cep}/json/"
-            );
-
-            if (resultado == null || resultado.Erro)
+            if (resultado == null)
             {
                 return NotFound(new { erro = "CEP não encontrado." });
             }
@@ -207,46 +207,9 @@ namespace AEC.Controllers
                 .Where(e => e.UsuarioId == usuarioId)
                 .ToListAsync();
 
-            var csv = new StringBuilder();
+            var arquivo = _csvService.GerarCsvEnderecos(enderecos);
 
-            csv.AppendLine("Id;CEP;Logradouro;Numero;Complemento;Bairro;Cidade;UF");
-
-            foreach (var endereco in enderecos)
-            {
-                csv.AppendLine(
-                    $"{endereco.Id};" +
-                    $"{TratarCampoCsv(endereco.Cep)};" +
-                    $"{TratarCampoCsv(endereco.Logradouro)};" +
-                    $"{TratarCampoCsv(endereco.Numero)};" +
-                    $"{TratarCampoCsv(endereco.Complemento)};" +
-                    $"{TratarCampoCsv(endereco.Bairro)};" +
-                    $"{TratarCampoCsv(endereco.Cidade)};" +
-                    $"{TratarCampoCsv(endereco.Uf)}"
-                );
-            }
-
-            var bytes = Encoding.UTF8.GetPreamble()
-                .Concat(Encoding.UTF8.GetBytes(csv.ToString()))
-                .ToArray();
-
-            return File(bytes, "text/csv", "enderecos.csv");
-        }
-
-        private string TratarCampoCsv(string? campo)
-        {
-            if (string.IsNullOrEmpty(campo))
-            {
-                return "";
-            }
-
-            campo = campo.Replace("\"", "\"\"");
-
-            if (campo.Contains(";") || campo.Contains("\"") || campo.Contains("\n"))
-            {
-                return $"\"{campo}\"";
-            }
-
-            return campo;
+            return File(arquivo, "text/csv", "enderecos.csv");
         }
     }
 }
