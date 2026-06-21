@@ -56,6 +56,7 @@ AEC/
 - Scripts/
   - banco.sql
 
+- wwwroot/
 - Program.cs
 - appsettings.json
 - README.md
@@ -95,18 +96,18 @@ Scripts/banco.sql
 
 Para acessar o sistema, utilize:
 
-Usuário: admin
+Usuário: admin  
 Senha: 123456
 
 ## Como executar o projeto
 
 ### 1. Clonar o repositório
 
-git clone LINK_DO_REPOSITORIO
+git clone https://github.com/Yanna01santos/teste-dev-sharp-aec.git
 
 ### 2. Acessar a pasta do projeto
 
-cd AEC
+cd teste-dev-sharp-aec
 
 ### 3. Restaurar os pacotes
 
@@ -142,12 +143,21 @@ http://localhost:5000
 8. Na tela principal, é possível editar, excluir ou exportar os endereços cadastrados.
 9. Clique em "Exportar CSV" para baixar o arquivo com os endereços.
 
+## Scripts do banco
+
+O script de criação das tabelas está disponível em:
+
+Scripts/banco.sql
+
+Esse arquivo contém a estrutura das tabelas Usuarios e Enderecos, além da inserção de um usuário padrão para teste.
+
 ## Observações
 
 - O campo complemento é opcional.
 - O número do endereço é preenchido manualmente, pois a API ViaCEP não retorna essa informação.
 - A aplicação controla os endereços por usuário logado.
 - O arquivo CSV é gerado com os endereços cadastrados pelo usuário autenticado.
+- O arquivo de banco SQLite local não foi versionado no GitHub, pois ele é gerado automaticamente ao executar a aplicação.
 
 ## API utilizada
 
@@ -155,8 +165,14 @@ A integração de CEP foi feita utilizando a API pública ViaCEP:
 
 https://viacep.com.br/
 
+## Repositório
+
+https://github.com/Yanna01santos/teste-dev-sharp-aec
+
 ## Autor
+
 Yanna Aparecida
 
 Projeto desenvolvido para teste prático de Desenvolvedor C#.
+
 '@ | Set-Content -Path README.md -Encoding UTF8
