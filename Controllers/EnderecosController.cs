@@ -3,6 +3,7 @@ using AEC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace AEC.Controllers
 {
@@ -181,7 +182,71 @@ namespace AEC.Controllers
                 return NotFound(new { erro = "CEP não encontrado." });
             }
 
-            return Json(resultado);
+            return Json(new
+            {
+                cep = resultado.Cep,
+                logradouro = resultado.Logradouro,
+                complemento = resultado.Complemento,
+                bairro = resultado.Bairro,
+                cidade = resultado.Cidade,
+                localidade = resultado.Cidade,
+                uf = resultado.Uf
+            });
+        }
+
+        public async Task<IActionResult> ExportarCsv()
+        {
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+
+            if (usuarioId == null)
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
+            var enderecos = await _context.Enderecos
+                .Where(e => e.UsuarioId == usuarioId)
+                .ToListAsync();
+
+            var csv = new StringBuilder();
+
+            csv.AppendLine("Id;CEP;Logradouro;Numero;Complemento;Bairro;Cidade;UF");
+
+            foreach (var endereco in enderecos)
+            {
+                csv.AppendLine(
+                    $"{endereco.Id};" +
+                    $"{TratarCampoCsv(endereco.Cep)};" +
+                    $"{TratarCampoCsv(endereco.Logradouro)};" +
+                    $"{TratarCampoCsv(endereco.Numero)};" +
+                    $"{TratarCampoCsv(endereco.Complemento)};" +
+                    $"{TratarCampoCsv(endereco.Bairro)};" +
+                    $"{TratarCampoCsv(endereco.Cidade)};" +
+                    $"{TratarCampoCsv(endereco.Uf)}"
+                );
+            }
+
+            var bytes = Encoding.UTF8.GetPreamble()
+                .Concat(Encoding.UTF8.GetBytes(csv.ToString()))
+                .ToArray();
+
+            return File(bytes, "text/csv", "enderecos.csv");
+        }
+
+        private string TratarCampoCsv(string? campo)
+        {
+            if (string.IsNullOrEmpty(campo))
+            {
+                return "";
+            }
+
+            campo = campo.Replace("\"", "\"\"");
+
+            if (campo.Contains(";") || campo.Contains("\"") || campo.Contains("\n"))
+            {
+                return $"\"{campo}\"";
+            }
+
+            return campo;
         }
     }
 }

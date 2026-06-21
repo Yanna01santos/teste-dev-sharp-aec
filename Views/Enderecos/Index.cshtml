@@ -13,8 +13,17 @@
         </div>
 
         <div>
-            <a asp-action="Criar" class="btn btn-primary">Novo Endereço</a>
-            <a asp-controller="Login" asp-action="Sair" class="btn btn-outline-danger">Sair</a>
+            <a href="/Enderecos/Criar" class="btn btn-primary">
+                Novo Endereço
+            </a>
+
+            <a href="/Enderecos/ExportarCsv" class="btn btn-success">
+                Exportar CSV
+            </a>
+
+            <a href="/Login/Sair" class="btn btn-outline-danger">
+                Sair
+            </a>
         </div>
     </div>
 
@@ -50,11 +59,11 @@
                         <td>@endereco.Cidade</td>
                         <td>@endereco.Uf</td>
                         <td>
-                            <a asp-action="Editar" asp-route-id="@endereco.Id" class="btn btn-sm btn-warning">
+                            <a href="/Enderecos/Editar/@endereco.Id" class="btn btn-sm btn-warning">
                                 Editar
                             </a>
 
-                            <a asp-action="Excluir" asp-route-id="@endereco.Id" class="btn btn-sm btn-danger">
+                            <a href="/Enderecos/Excluir/@endereco.Id" class="btn btn-sm btn-danger">
                                 Excluir
                             </a>
                         </td>
