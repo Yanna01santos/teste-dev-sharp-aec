@@ -2,16 +2,19 @@ using AEC.Data;
 using AEC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Json;
 
 namespace AEC.Controllers
 {
     public class EnderecosController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public EnderecosController(AppDbContext context)
+        public EnderecosController(AppDbContext context, IHttpClientFactory httpClientFactory)
         {
             _context = context;
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<IActionResult> Index()
@@ -150,6 +153,35 @@ namespace AEC.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BuscarCep(string cep)
+        {
+            if (string.IsNullOrWhiteSpace(cep))
+            {
+                return BadRequest(new { erro = "Informe um CEP válido." });
+            }
+
+            cep = new string(cep.Where(char.IsDigit).ToArray());
+
+            if (cep.Length != 8)
+            {
+                return BadRequest(new { erro = "O CEP deve conter 8 dígitos." });
+            }
+
+            var client = _httpClientFactory.CreateClient();
+
+            var resultado = await client.GetFromJsonAsync<ViaCepResposta>(
+                $"https://viacep.com.br/ws/{cep}/json/"
+            );
+
+            if (resultado == null || resultado.Erro)
+            {
+                return NotFound(new { erro = "CEP não encontrado." });
+            }
+
+            return Json(resultado);
         }
     }
 }
