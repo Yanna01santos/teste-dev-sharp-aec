@@ -156,6 +156,7 @@ A integração de CEP foi feita utilizando a API pública ViaCEP:
 https://viacep.com.br/
 
 ## Autor
+Yanna Aparecida
 
 Projeto desenvolvido para teste prático de Desenvolvedor C#.
 '@ | Set-Content -Path README.md -Encoding UTF8
